@@ -178,7 +178,7 @@ class Gamepad:
     # private methods
 
     def _get_device_list(self):
-        """Returns a list of joystick devices"""
+        """Returns a list of relivent devices"""
         for filename in os.listdir("/dev/input"):
             if filename.startswith("js"):
                 yield os.path.join("/dev/input", filename)
@@ -344,6 +344,7 @@ class Gamepad:
         return common_names.values()
 
     def axis(self, axis):
+        """Returns the value currently input for that axis""" 
         if self._connected:
             for k, v in self._axis_states.items():
                 if common_names[k] == axis:
@@ -352,6 +353,7 @@ class Gamepad:
             return 0.0
 
     def button(self, button):
+        """Returns True if button is pressed"""
         if self._connected:
             for k, v in self._button_states.items():
                 if common_names[k] == button:
@@ -360,9 +362,11 @@ class Gamepad:
             return False
 
     def on(self, event, handler, *args, **kwargs):
+        """Adds a function to listen for an event"""
         self._handlers.append(Handler(event, handler, *args, **kwargs))
 
     def watch_all(self):
+        """Outputs all events occuring"""
 
         def _on_connect():
             print("Gamepad connected: {}".format(self.name))
