@@ -124,13 +124,32 @@ device_name_keywords = (
 
 
 class Handler:
+    """Base class for handling events"""
+    
     def __init__(self, event, fn, *args, **kwargs):
+        """
+        Creates a hanlder object
+        
+        Takes the event to listen to
+        and calls the function when the event occurs
+        
+        Aruments:
+        string: Event -- Name of event to listen to
+        function: fn  -- Function to be called on event"""
+        
         self.event = event
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
 
     def __call__(self, *a, **kw):
+        """
+        Calls the function that this function stores
+        
+        Calls the function that has is listening for an event
+        when the even occurs
+        
+        Keyword and possition arguments are spesific to events"""
         return self.fn(*(self.args + a), **dict(self.kwargs, **kw))
 
 
@@ -159,19 +178,23 @@ class Gamepad:
     # private methods
 
     def _get_device_list(self):
+        """Returns a list of joystick devices"""
         for filename in os.listdir("/dev/input"):
             if filename.startswith("js"):
                 yield os.path.join("/dev/input", filename)
 
     def _open_device(self, device):
+        """returns the devices output"""
         return open(device, "rb")
 
     def _get_name(self, _file):
+        """Decodes file and returns the name of a device"""
         buf = array.array('B', [0] * 64)
         ioctl(_file, 0x80006a13 + (0x10000 * len(buf)), buf)
         return buf.tobytes().decode("utf-8")
 
     def _get_num_axes(self, _file):
+        """Decodes file and returns num of axes"""
         buf = array.array('B', [0])
         ioctl(_file, 0x80016a11, buf)  # JSIOCGAXES
         return buf[0]
